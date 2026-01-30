@@ -1,6 +1,0 @@
-1. Generate pitches for brokers and owners
-2. Input format: Infor blocks with titles and one other block for extra info
-3. Repeated generation, editing pitches directly
-4 Output format: Dating app style
-5. Filters and dealbreakers
-6. revenue model: unlimited generations, new templates, pushing property, ads, 
