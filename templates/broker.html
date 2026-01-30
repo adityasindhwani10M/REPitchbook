@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Intake</title>
+    <style>
+        :root { 
+            --primary: #557C55; 
+            --primary-hover: #3E5E3E;
+            --bg-color: #ffffff; 
+            --input-bg: #F2F8F2; 
+            --border: #A4C3A2; 
+            --text-main: #2F4F2F;
+            --success: #557C55;
+        }
+        body { background: var(--bg-color); color: var(--text-main); font-family: system-ui, sans-serif; padding: 2rem; max-width: 850px; margin: 0 auto; line-height: 1.5; }
+        
+        /* Header & Nav */
+        .header-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+        .logo-img { height: 50px; width: auto; }
+        .btn-nav {
+            background-color: white; color: var(--primary); padding: 0.5rem 1rem; border-radius: 8px;
+            text-decoration: none; font-weight: bold; border: 2px solid var(--primary); transition: all 0.2s;
+        }
+        .btn-nav:hover { background-color: var(--primary); color: white; }
+
+        h1 { color: #354F35; text-align: center; margin-top: 0; margin-bottom: 0.5rem; }
+        p.subtitle { color: #6B8C6B; text-align: center; margin-bottom: 1.5rem; }
+        
+        /* Form Cards */
+        .card { 
+            background: white; border: 1px solid var(--border); border-radius: 10px; 
+            padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 4px 10px rgba(85,124,85,0.1); 
+        }
+        
+        .section-title {
+            font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem; border-bottom: 2px solid var(--border);
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        /* Grid Layouts */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+        .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+        
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; }
+        
+        input, select, textarea { 
+            width: 100%; padding: 0.75rem; border: 1px solid var(--border); 
+            border-radius: 6px; background: var(--input-bg); font-size: 0.95rem;
+        }
+        
+        /* Radio & Checkbox */
+        .radio-group { display: flex; gap: 1rem; background: var(--input-bg); padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border); flex-wrap: wrap; }
+        .radio-option { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem; }
+        
+        .checkbox-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; }
+        .checkbox-option {
+            display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem; 
+            border: 1px solid var(--border); border-radius: 6px; cursor: pointer; background: var(--input-bg); font-size: 0.9rem;
+        }
+        .checkbox-option:hover { background: #e8f5e8; border-color: var(--primary); }
+
+        /* Buttons */
+        .btn { width: 100%; padding: 1rem; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        
+        /* Dynamic Lists */
+        .dynamic-list-item { display: grid; grid-template-columns: 1.5fr 2fr 1fr auto; gap: 0.5rem; margin-bottom: 0.75rem; align-items: center; }
+        .remove-btn { color: #ef4444; cursor: pointer; font-size: 1.2rem; font-weight: bold; padding: 0 0.5rem; }
+
+        .hidden { display: none; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Summary View Specifics */
+        .summary-badge { background: var(--success); color: white; padding: 0.25rem 0.75rem; border-radius: 99px; font-size: 0.8rem; display: inline-block; margin-bottom: 1rem; }
+        .data-row { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px dashed var(--border); }
+        .data-label { color: #6B8C6B; font-size: 0.95rem; }
+        .data-val { font-weight: 600; text-align: right; color: var(--text-main); max-width: 60%; }
+        #sum-pitch-box { white-space: pre-line; background: #f0f7f0; padding: 1rem; border-left: 4px solid var(--primary); margin-bottom: 1rem; }
+        
+        @media (max-width: 650px) {
+            .form-grid, .grid-3 { grid-template-columns: 1fr; }
+            .dynamic-list-item { grid-template-columns: 1fr; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="header-nav">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="PropMatch" class="logo-img">
+        <a href="/" class="btn-nav">Home</a>
+    </nav>
+
+    <h1>Property Listing Form</h1>
+    <p class="subtitle">Detailed Intake for Indian Real Estate</p>
+
+    <form id="propertyForm">
+        
+        <!-- 1. User & Transaction Type -->
+        <div class="card">
+            <div class="section-title">👤 User & Deal Type</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>I am a:</label>
+                    <div class="radio-group">
+                        <label class="radio-option"><input type="radio" name="userType" value="Owner" checked onchange="toggleUserFields()"> Owner</label>
+                        <label class="radio-option"><input type="radio" name="userType" value="Broker" onchange="toggleUserFields()"> Broker</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Transaction Type:</label>
+                    <div class="radio-group">
+                        <label class="radio-option"><input type="radio" name="transType" value="Resale" checked> Resale</label>
+                        <label class="radio-option"><input type="radio" name="transType" value="New Booking"> New Booking</label>
+                    </div>
+                </div>
+            </div>
+
+            <div id="owner-fields" class="fade-in">
+                <div class="form-group">
+                    <label>Owner Mobile</label>
+                    <input type="text" name="ownerPhone" placeholder="+91 98765 43210">
+                </div>
+            </div>
+
+            <div id="broker-fields" class="hidden fade-in">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Broker Mobile</label>
+                        <input type="text" name="brokerPhone" placeholder="+91 98765 43210">
+                    </div>
+                    <div class="form-group">
+                        <label>Commission (%)</label>
+                        <input type="number" name="brokerCommission" placeholder="e.g. 1.0" step="0.1">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Location & Basics -->
+        <div class="card">
+            <div class="section-title">📍 Location & Price</div>
+            <div class="form-group">
+                <label>Listing Title</label>
+                <input type="text" name="title" placeholder="e.g. Premium 30x40 Plot in Whitefield" required>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Expected Price (₹)</label>
+                    <input type="text" name="price" placeholder="e.g. 85 Lakhs">
+                </div>
+                <div class="form-group">
+                    <label>Price Negotiable?</label>
+                    <div class="radio-group">
+                        <label class="radio-option"><input type="radio" name="negotiable" value="Yes" checked> Yes</label>
+                        <label class="radio-option"><input type="radio" name="negotiable" value="No"> No</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Property Address / Locality</label>
+                <input type="text" name="locality" placeholder="House No, Street, Colony (e.g. 4th Block, Jayanagar)">
+            </div>
+            <div class="form-grid grid-3">
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" name="city" placeholder="e.g. Bangalore">
+                </div>
+                <div class="form-group">
+                    <label>State</label>
+                    <input type="text" name="state" placeholder="e.g. Karnataka">
+                </div>
+                <div class="form-group">
+                    <label>Pincode</label>
+                    <input type="text" name="pincode" placeholder="e.g. 560041">
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Property Classification -->
+        <div class="card">
+            <div class="section-title">🏠 Property Type</div>
+            <div class="form-group">
+                <label>Select Type</label>
+                <select name="propertyType" id="propertyTypeSelect" onchange="togglePropertyFields()">
+                    <option value="Built">🏢 Built / Apartment / Villa</option>
+                    <option value="Land">🌱 Land / Plot</option>
+                    <option value="Other">🏗️ Other / Commercial</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 4. Land Details -->
+        <div id="land-details" class="card hidden fade-in">
+            <div class="section-title">🌱 Plot Specifics</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Total Area</label>
+                    <input type="text" name="landArea" placeholder="e.g. 1200 sq ft">
+                </div>
+                <div class="form-group">
+                    <label>Dimensions</label>
+                    <input type="text" name="dimensions" placeholder="e.g. 30 x 40 ft">
+                </div>
+                <div class="form-group">
+                    <label>Facing</label>
+                    <select name="facing">
+                        <option value="">Select...</option>
+                        <option value="North">North</option>
+                        <option value="South">South</option>
+                        <option value="East">East</option>
+                        <option value="West">West</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Road Width</label>
+                    <input type="text" name="roadWidth" placeholder="e.g. 30 ft">
+                </div>
+            </div>
+            
+            <div class="form-group" style="margin-top: 1rem;">
+                <label>Utilities</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-option"><input type="checkbox" name="utilities" value="Electricity"> Electricity</label>
+                    <label class="checkbox-option"><input type="checkbox" name="utilities" value="Water"> Water</label>
+                    <label class="checkbox-option"><input type="checkbox" name="utilities" value="Sewage"> Sewage</label>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 0.5rem;">
+                 <label>Approval Authority</label>
+                 <input type="text" name="approval" placeholder="Authority Name (e.g. BDA, BBMP)">
+            </div>
+
+            <div class="form-group" style="margin-top: 1rem;">
+                <label>Land Features</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-option"><input type="checkbox" name="landFeat" value="Corner"> Corner</label>
+                    <label class="checkbox-option"><input type="checkbox" name="landFeat" value="Borewell"> Borewell</label>
+                    <label class="checkbox-option"><input type="checkbox" name="landFeat" value="Gated"> Gated</label>
+                    <label class="checkbox-option"><input type="checkbox" name="landFeat" value="Wall"> Boundary Wall</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Built Details -->
+        <div id="built-details" class="card fade-in">
+            <div class="section-title">🏢 Apartment Details</div>
+            <div class="form-grid grid-3">
+                <div class="form-group">
+                    <label>Config</label>
+                    <select name="bhk">
+                        <option value="1 BHK">1 BHK</option>
+                        <option value="2 BHK">2 BHK</option>
+                        <option value="3 BHK" selected>3 BHK</option>
+                        <option value="4+ BHK">4+ BHK</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Bathrooms</label>
+                    <input type="number" name="bathrooms" placeholder="2">
+                </div>
+                <div class="form-group">
+                    <label>Balconies</label>
+                    <input type="number" name="balconies" placeholder="2">
+                </div>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>SBA (sq ft)</label>
+                    <input type="number" name="sba" placeholder="1800">
+                </div>
+                <div class="form-group">
+                    <label>Furnishing</label>
+                    <select name="furnishing">
+                        <option value="Unfurnished">Unfurnished</option>
+                        <option value="Semi-Furnished">Semi-Furnished</option>
+                        <option value="Fully Furnished">Fully Furnished</option>
+                    </select>
+                </div>
+            </div>
+             <div class="form-group">
+                <label>Amenities</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-option"><input type="checkbox" name="amenity" value="Pool"> Pool</label>
+                    <label class="checkbox-option"><input type="checkbox" name="amenity" value="Gym"> Gym</label>
+                    <label class="checkbox-option"><input type="checkbox" name="amenity" value="Garden"> Garden</label>
+                    <label class="checkbox-option"><input type="checkbox" name="amenity" value="Parking"> Parking</label>
+                    <label class="checkbox-option"><input type="checkbox" name="amenity" value="Lift"> Lift</label>
+                    <label class="checkbox-option"><input type="checkbox" name="amenity" value="Security"> Security</label>
+                    <label class="checkbox-option"><input type="checkbox" name="amenity" value="Clubhouse"> Clubhouse</label>
+                    <label class="checkbox-option"><input type="checkbox" name="amenity" value="PowerBackup"> Power Backup</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Landmarks -->
+        <div class="card">
+            <div class="section-title">🏥 Nearby Landmarks</div>
+            <div id="landmark-container"></div>
+            <button type="button" class="btn btn-outline" onclick="addLandmark()">+ Add Landmark</button>
+        </div>
+
+        <!-- 7. Photos & Legal -->
+        <div class="card">
+            <div class="section-title">📷 Photos & Legal Info</div>
+            <div class="form-group">
+                 <label>Primary Image</label>
+                 <input type="file" id="imageInput" accept="image/*">
+                 <small style="color: #6B8C6B; margin-top: 0.2rem; display: block;">Upload from local drive (will be saved to database)</small>
+            </div>
+            <div class="form-group">
+                <label>Additional Notes</label>
+                <textarea name="notes" rows="3" placeholder="Additional details..."></textarea>
+            </div>
+        </div>
+
+        <!-- Submit Section -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <button type="button" id="btn-process" class="btn btn-outline" onclick="submitForm('process')">Save Property</button>
+            <button type="button" id="btn-pitch" class="btn btn-primary" onclick="submitForm('pitch')">Generate Pitch</button>
+        </div>
+    </form>
+
+    <!-- Detailed Summary / Success View -->
+    <div id="summary-view" class="fade-in hidden">
+        <div class="card" style="border-top: 5px solid var(--success);">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div class="summary-badge">✔ Property Processed</div>
+                <h2 id="sum-title">Title</h2>
+                <p id="sum-subtitle" style="color: #6B8C6B;">Location</p>
+                <div id="sum-price" style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-top: 0.5rem;"></div>
+            </div>
+
+            <!-- Pitch Section -->
+            <div id="pitch-container" class="hidden">
+                <div class="section-title">📢 Professional Pitch</div>
+                <div id="sum-pitch-box"></div>
+            </div>
+
+            <div class="section-title">Deal Profile</div>
+            <div id="sum-user"></div>
+
+            <div class="section-title" id="sum-details-title">Details</div>
+            <div id="sum-details"></div>
+
+            <div class="section-title" style="margin-top: 2rem;">Connectivity & Landmarks</div>
+            <div id="sum-landmarks"></div>
+
+            <div class="section-title" style="margin-top: 2rem;">Notes</div>
+            <div class="data-row" style="flex-direction: column; border-bottom: none; margin-top: 1rem;">
+                <div id="sum-notes" style="background: var(--input-bg); padding: 1rem; border-radius: 6px; font-style: italic; color: var(--text-main); border: 1px solid var(--border);"></div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem;">
+                <button onclick="location.reload()" class="btn btn-outline">Add Another</button>
+                <a href="/customer" class="btn btn-primary" style="text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center;">View in App ➔</a>
+            </div>
+        </div>
+    </div>
+
+<script>
+    window.onload = function() { addLandmark(); };
+
+    function toggleUserFields() {
+        const userType = document.querySelector('input[name="userType"]:checked').value;
+        document.getElementById('owner-fields').classList.toggle('hidden', userType !== 'Owner');
+        document.getElementById('broker-fields').classList.toggle('hidden', userType !== 'Broker');
+    }
+
+    function togglePropertyFields() {
+        const type = document.getElementById('propertyTypeSelect').value;
+        document.getElementById('land-details').classList.toggle('hidden', type !== 'Land');
+        document.getElementById('built-details').classList.toggle('hidden', type !== 'Built');
+    }
+
+    function addLandmark() {
+        const container = document.getElementById('landmark-container');
+        const div = document.createElement('div');
+        div.className = 'dynamic-list-item fade-in';
+        div.innerHTML = `
+            <select name="landmarkType[]" style="padding: 0.6rem;">
+                <option value="General">General</option>
+                <option value="School">School</option>
+                <option value="Metro">Metro</option>
+                <option value="Hospital">Hospital</option>
+            </select>
+            <input type="text" name="landmarkName[]" placeholder="Name">
+            <input type="text" name="landmarkDist[]" placeholder="Dist (e.g. 2km)">
+            <span class="remove-btn" onclick="this.parentElement.remove()">×</span>
+        `;
+        container.appendChild(div);
+    }
+
+    async function submitForm(action) {
+        const form = document.getElementById('propertyForm');
+        const formData = new FormData(form);
+        const rawData = Object.fromEntries(formData.entries());
+        
+        // 1. Handle Multi-selects
+        const amenities = Array.from(document.querySelectorAll('input[name="amenity"]:checked')).map(el => el.value);
+        const landFeatures = Array.from(document.querySelectorAll('input[name="landFeat"]:checked')).map(el => el.value);
+        const utilities = Array.from(document.querySelectorAll('input[name="utilities"]:checked')).map(el => el.value);
+        
+        // 2. Handle Landmarks
+        const landmarks = [];
+        const lmTypes = document.querySelectorAll('select[name="landmarkType[]"]');
+        const lmNames = document.querySelectorAll('input[name="landmarkName[]"]');
+        const lmDists = document.querySelectorAll('input[name="landmarkDist[]"]');
+        
+        lmTypes.forEach((el, index) => {
+            if(lmNames[index].value) {
+                landmarks.push({ type: el.value, name: lmNames[index].value, dist: lmDists[index].value });
+            }
+        });
+
+        // 3. Handle Image Upload (Local File)
+        let imagePayload = "";
+        const fileInput = document.getElementById('imageInput');
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            try {
+                imagePayload = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            } catch (err) {
+                console.error("Error reading file:", err);
+                alert("Could not process image file.");
+                return;
+            }
+        }
+
+        const contact = rawData.userType === 'Owner' 
+            ? { type: 'Owner', phone: rawData.ownerPhone } 
+            : { type: 'Broker', phone: rawData.brokerPhone, commission: rawData.brokerCommission };
+
+        // 4. Construct Payload
+        const payload = {
+            title: rawData.title,
+            price: rawData.price,
+            negotiable: rawData.negotiable,
+            locality: rawData.locality,
+            city: rawData.city,
+            state: rawData.state,
+            pincode: rawData.pincode,
+            type: rawData.propertyType,
+            location: `${rawData.locality || ''}, ${rawData.city || ''}`,
+            contact: contact,
+            description: rawData.notes,
+            image: imagePayload, // Sending Base64 string
+            
+            // Built details
+            bhk: rawData.bhk,
+            bathrooms: rawData.bathrooms,
+            balconies: rawData.balconies,
+            sba: rawData.sba,
+            furnishing: rawData.furnishing,
+            amenities: amenities,
+
+            // Land details
+            landArea: rawData.landArea,
+            dimensions: rawData.dimensions,
+            facing: rawData.facing,
+            roadWidth: rawData.roadWidth,
+            features: landFeatures,
+            utilities: utilities,
+            approval: rawData.approval,
+            
+            landmarks: landmarks
+        };
+
+        const btnProcess = document.getElementById('btn-process');
+        const btnPitch = document.getElementById('btn-pitch');
+        btnProcess.disabled = true; btnPitch.disabled = true;
+
+        if (action === 'process') {
+            try {
+                const res = await fetch('/api/properties', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if(res.ok) {
+                    showSummary(payload); // Passing payload to show details
+                } else {
+                    alert("Error saving property");
+                }
+            } catch(e) { console.error(e); alert("Server error"); }
+        
+        } else if (action === 'pitch') {
+            btnPitch.textContent = "Generating...";
+            try {
+                const res = await fetch('/api/pitch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                
+                showSummary(payload);
+                document.getElementById('pitch-container').classList.remove('hidden');
+                document.getElementById('sum-pitch-box').textContent = result.pitch;
+            } catch(e) {
+                alert("Error generating pitch");
+            } finally {
+                btnPitch.textContent = "Generate Pitch";
+            }
+        }
+        btnProcess.disabled = false; btnPitch.disabled = false;
+    }
+
+    function showSummary(data) {
+        document.getElementById('propertyForm').classList.add('hidden');
+        document.getElementById('summary-view').classList.remove('hidden');
+
+        // Populate Basic Info
+        document.getElementById('sum-title').textContent = data.title || "Untitled";
+        document.getElementById('sum-subtitle').textContent = data.location || "No Location Provided";
+        document.getElementById('sum-price').textContent = `₹ ${data.price} (${data.negotiable})`;
+        document.getElementById('sum-notes').textContent = data.description || "No notes provided.";
+
+        // Populate User Info
+        let userHTML = `<div class="data-row"><span class="data-label">Type</span><span class="data-val">${data.contact.type}</span></div>`;
+        userHTML += `<div class="data-row"><span class="data-label">Contact</span><span class="data-val">${data.contact.phone}</span></div>`;
+        if(data.contact.type === 'Broker') {
+            userHTML += `<div class="data-row"><span class="data-label">Commission</span><span class="data-val">${data.contact.commission || '--'}%</span></div>`;
+        }
+        document.getElementById('sum-user').innerHTML = userHTML;
+
+        // Populate Details (Built vs Land)
+        let detailsHTML = "";
+        if(data.type === 'Built') {
+            detailsHTML += `<div class="data-row"><span class="data-label">BHK</span><span class="data-val">${data.bhk}</span></div>`;
+            detailsHTML += `<div class="data-row"><span class="data-label">Area</span><span class="data-val">${data.sba} sq ft</span></div>`;
+            detailsHTML += `<div class="data-row"><span class="data-label">Furnishing</span><span class="data-val">${data.furnishing}</span></div>`;
+            if(data.amenities && data.amenities.length > 0) {
+                 detailsHTML += `<div class="data-row" style="flex-direction:column"><span class="data-label" style="margin-bottom:0.3rem">Amenities</span><span class="data-val" style="text-align:left">${data.amenities.join(', ')}</span></div>`;
+            }
+        } else {
+            detailsHTML += `<div class="data-row"><span class="data-label">Area</span><span class="data-val">${data.landArea}</span></div>`;
+            detailsHTML += `<div class="data-row"><span class="data-label">Facing</span><span class="data-val">${data.facing}</span></div>`;
+            detailsHTML += `<div class="data-row"><span class="data-label">Dims</span><span class="data-val">${data.dimensions}</span></div>`;
+            if(data.approval) {
+                detailsHTML += `<div class="data-row"><span class="data-label">Approval</span><span class="data-val">${data.approval}</span></div>`;
+            }
+            if(data.utilities && data.utilities.length > 0) {
+                 detailsHTML += `<div class="data-row"><span class="data-label">Utilities</span><span class="data-val">${data.utilities.join(', ')}</span></div>`;
+            }
+            if(data.features && data.features.length > 0) {
+                 detailsHTML += `<div class="data-row" style="flex-direction:column"><span class="data-label" style="margin-bottom:0.3rem">Features</span><span class="data-val" style="text-align:left">${data.features.join(', ')}</span></div>`;
+            }
+        }
+        document.getElementById('sum-details').innerHTML = detailsHTML;
+
+        // Populate Landmarks
+        let lmHTML = "";
+        if(data.landmarks && data.landmarks.length > 0) {
+            data.landmarks.forEach(lm => {
+                lmHTML += `<div class="data-row"><span class="data-label">${lm.type}</span><span class="data-val">${lm.name} (${lm.dist})</span></div>`;
+            });
+        } else {
+            lmHTML = `<p style="color:#999; font-style:italic;">No landmarks added.</p>`;
+        }
+        document.getElementById('sum-landmarks').innerHTML = lmHTML;
+    }
+</script>
+</body>
+</html>

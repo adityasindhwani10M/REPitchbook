@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate Portal</title>
+    <style>
+        :root {
+            --primary: #557C55;
+            --bg-color: #F2F8F2;
+            --card-bg: #ffffff;
+            --text-main: #2F4F2F;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: system-ui, sans-serif;
+            margin: 0;
+            position: relative; /* For absolute positioning of logo */
+        }
+
+        /* Top Left Logo */
+        .brand-logo {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            height: 60px; /* Adjust size as needed */
+            width: auto;
+        }
+
+        .container { text-align: center; max-width: 800px; padding: 1rem; }
+        
+        h1 { color: var(--primary); font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .subtitle { color: #6B8C6B; margin-bottom: 3rem; font-size: 1.1rem; }
+
+        .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+
+        .role-card {
+            background: var(--card-bg);
+            padding: 3rem 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(85, 124, 85, 0.1);
+            text-decoration: none;
+            color: var(--text-main);
+            transition: transform 0.2s;
+            display: block;
+        }
+
+        .role-card:hover { transform: translateY(-5px); }
+        
+        .icon { font-size: 3rem; display: block; margin-bottom: 1rem; }
+        .role-title { font-size: 1.5rem; font-weight: 700; display: block; }
+    </style>
+</head>
+<body>
+    <!-- Logo Image -->
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="PropMatch Logo" class="brand-logo">
+
+    <div class="container">
+        <h1>Welcome</h1>
+        <p class="subtitle">Select your role to continue</p>
+        <div class="role-grid">
+            <a href="/customer" class="role-card">
+                <span class="icon">🏠</span>
+                <span class="role-title">I'm a Customer</span>
+            </a>
+            <a href="/broker" class="role-card">
+                <span class="icon">💼</span>
+                <span class="role-title">I'm a Broker</span>
+            </a>
+        </div>
+    </div>
+</body>
+</html>
