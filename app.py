@@ -12,7 +12,7 @@ app = Flask(__name__)
 # Replace with your actual API Key if you have one, or set it in your environment variables
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "YOUR_API_KEY_HERE")
 
-if GEMINI_API_KEY != "YOUR_API_KEY_HERE":
+if GEMINI_API_KEY != "AIzaSyDGo_VGC4C2TVA5d9ePzh2wKzZxIRh54dk":
     genai.configure(api_key=GEMINI_API_KEY)
 
 # --- DATABASE SETUP ---
